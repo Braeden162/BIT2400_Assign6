@@ -89,9 +89,8 @@
 
 #include "time.h"
 #include "stdio.h"
-#include "iostream"
 #include "math.h"
-
+#include "iostream"
 using namespace std;
 
 // Classes
@@ -152,9 +151,11 @@ public:
 	int id;
 	int numTrans;
 	Transaction* tr[100];
+	float accBal;
 	void Report();
 	User()
 	{
+		accBal = 10;
 		id = -1;
 		numTrans = 0;
 	}
@@ -162,74 +163,122 @@ public:
 
 void User::Report()
 {
-	cout << "Number of Transactions: " << numTrans << "\n";
+	cout << "Account Balance: $" << accBal << "\nNumber of Transactions: " << numTrans << "\n";
 }
 
 
 void main()
 {
 	User* users[100];
-	int numUsers = 0; // number of users that exist
-	bool usrExist; 
+	int numUsers = 5; // number of users that exist
+	bool usrExist;
 	int curUser;
 	bool exit = false;
 	float a; // user input amount
 	int t; // user input transaction choice
 	int u; // user input user id
+	bool valid;
+	srand(time(NULL));
 
+	for (int i = 0; i < 5; i++)
+	{
+		users[i] = new User();
+		users[i]->id = rand() % 1000 + 1000;
+		cout << "User" << i+1 << " ID: " << users[i]->id << "\n";
+	}
 
-	users[numUsers] = new User();
+	
+
 
 	while (exit == false)
 	{
-		usrExist = false;
-
-		cout << "Enter user id: ";
-		cin >> u;
-
-		for (int i = 0; i < numUsers; i++)
+		valid = false;
+		while (valid == false)
 		{
-			if (u == users[i]->id)
+			usrExist = false;
+
+			cout << "Enter user id: ";
+			cin >> u;
+
+			for (int i = 0; i < numUsers; i++)
 			{
-				curUser = i;
-				usrExist = true;
-				cout << "\n*Login Successful*\n\n";
+				if (u == users[i]->id)
+				{
+					curUser = i;
+					usrExist = true;
+					cout << "\n*Login Successful*\n\n";
+					valid = true;
+					break;
+				}
 			}
-		}
-		if (usrExist == false)
-		{
-			curUser = numUsers;
-			if (numUsers != 0)
-				users[curUser] = new User();
-			users[curUser]->id = u;
-			cout << "\n*New User Created*\n\n";
-			numUsers++;
+			if (usrExist == false && u >= 1000 && u <= 2000)
+			{
+				curUser = numUsers;
+				if (numUsers != 0)
+					users[curUser] = new User();
+				users[curUser]->id = u;
+				cout << "\n*New User Created*\n\n";
+				numUsers++;
+				valid = true;
+			}
+			else if (u < 1000 || u > 2000)
+			{
+				cout << "User ID Invalid\n";
+			}
 		}
 		if (users[curUser]->numTrans <= 100)
 		{
-			cout << "Enter Task From Following List: \n1) Withdraw\n2) Deposit\n3) Transfer\n4) Exit\n>";
-			cin >> t;
-
-			//create new object corresponding to action chosen
-			switch (t)
+			valid = false;
+			while (valid == false)
 			{
-			case 1:
-				users[curUser]->tr[users[curUser]->numTrans] = new Withdraw();
-				break;
-			case 2:
-				users[curUser]->tr[users[curUser]->numTrans] = new Deposit();
-				break;
-			case 3:
-				users[curUser]->tr[users[curUser]->numTrans] = new Transfer();
-				break;
-			case 4:
-				exit = true;
-				break;
+				cout << "Enter Task From Following List: \n1) Withdraw\n2) Deposit\n3) Transfer\n4) Exit\n>";
+				cin >> t;
+
+				//create new object corresponding to action chosen
+				switch (t)
+				{
+				case 4:
+					exit = true;
+					valid = true;
+					break;
+				}
+				
+				if (exit == false)
+				{
+					cout << "Enter Amount: ";
+					cin >> a;
+					switch (t)
+					{
+					case 1:
+						if (users[curUser]->accBal - a > 10)
+						{
+							users[curUser]->tr[users[curUser]->numTrans] = new Withdraw();
+							users[curUser]->accBal -= a;
+							valid = true;
+						}
+						else
+							cout << "Invalid Transaction\n";
+						break;
+					case 2:
+						users[curUser]->tr[users[curUser]->numTrans] = new Deposit();
+						users[curUser]->accBal += a;
+						valid = true;
+						break;
+					case 3:
+						if (users[curUser]->accBal - a > 10)
+						{
+							users[curUser]->tr[users[curUser]->numTrans] = new Transfer();
+							users[curUser]->accBal -= a;
+							valid = true;
+						}
+						else
+							cout << "Invalid Transaction\n";
+						break;
+					}
+				}
 			}
 			if (exit == false)
 			{
-				cout << "Enter Amount: ";
-				cin >> a;
 				//set transaction amount and transaction user ID
 				users[curUser]->tr[users[curUser]->numTrans]->amount = a;
 				users[curUser]->tr[users[curUser]->numTrans]->userID = u;
@@ -246,7 +295,7 @@ void main()
 		}
 		else
 			break;
-		
-		
+
+
 	}
 }
