@@ -167,6 +167,19 @@ void User::Report()
 }
 
 
+void CreateRandAccount(User* o1, int* curUser){
+	o1 = new User();
+	o1->id = rand() % 1000 + 1000;
+	cout << "User" << curUser+1 << " ID: " << o1->id << "\n";
+}
+
+void startTrans(User* o1){
+	o1->tr[users[curUser]->numTrans]->amount = a;
+	o1->tr[users[curUser]->numTrans]->userID = u;
+	o1->numTrans++; // increment number of transactions done by that user
+	cout << "\n";	
+}
+
 void main()
 {
 	User* users[100];
@@ -180,15 +193,11 @@ void main()
 	bool valid;
 	srand(time(NULL));
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < numUsers; i++)
 	{
-		users[i] = new User();
-		users[i]->id = rand() % 1000 + 1000;
-		cout << "User" << i+1 << " ID: " << users[i]->id << "\n";
+		CreateRandAccount(users[i], curUser);
+		curUser++;
 	}
-
-	
-
 
 	while (exit == false)
 	{
@@ -280,10 +289,7 @@ void main()
 			if (exit == false)
 			{
 				//set transaction amount and transaction user ID
-				users[curUser]->tr[users[curUser]->numTrans]->amount = a;
-				users[curUser]->tr[users[curUser]->numTrans]->userID = u;
-				users[curUser]->numTrans++; // increment number of transactions done by that user
-				cout << "\n";
+				StartTrans(users[curUser]);
 				for (int i = 0; i < users[curUser]->numTrans; i++)
 				{
 					users[curUser]->tr[i]->Report();
